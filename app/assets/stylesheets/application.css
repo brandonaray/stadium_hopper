@@ -8,3 +8,293 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* ============================================================
+   Stadium Hopper – application styles
+   ============================================================ */
+
+/* 1. Box-sizing reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Base */
+html {
+  background: #f4f6f8;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 1.75rem 1rem 3rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  background: #f4f6f8;
+  color: #1c2333;
+}
+
+/* 3. Page heading */
+.page-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1c2333;
+  margin: 0 0 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+/* 4. Flash / alert */
+.flash-alert {
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  color: #991b1b;
+  margin-bottom: 1.25rem;
+  font-size: 0.9375rem;
+}
+
+/* 5. Search form card */
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  padding: 1.25rem 1.5rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 0;
+}
+
+/* 6. Individual field row */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1 1 150px;
+}
+
+.form-row label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* 7. Inputs and selects */
+.form-control {
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: #1c2333;
+  background: #fff;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control:hover {
+  border-color: #94a3b8;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* 8. Form actions (submit button row) */
+.form-actions {
+  display: flex;
+  align-items: flex-end;
+  flex: 0 0 auto;
+}
+
+/* 9. Primary button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 2.5rem;
+  padding: 0 1.375rem;
+  background: #1e40af;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.btn-primary:hover {
+  background: #1d3a9e;
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+}
+
+.btn-primary:disabled,
+.btn-primary[aria-busy="true"] {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* 10. Spinner – injected by search_form_controller.js */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-left-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* 11. Turbo frame wrapper */
+#cluster-results {
+  display: block;
+  margin-top: 2rem;
+}
+
+/* 12. Empty state */
+.empty-state {
+  color: #64748b;
+  font-size: 0.9375rem;
+  text-align: center;
+  padding: 3rem 1rem;
+  margin: 0;
+}
+
+/* 13. Cluster list grid */
+.cluster-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 14. Cluster card */
+.cluster-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+/* 15. Card header / stadium list */
+.cluster-card__header {
+  margin-bottom: 0.75rem;
+}
+
+.cluster-card__stadiums {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1.25rem;
+}
+
+.cluster-card__stadium {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+
+.stadium-team {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: #1c2333;
+}
+
+.stadium-city {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+/* 16. Date range */
+.cluster-card__dates {
+  font-size: 0.9375rem;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+/* 17. Stats row – pill badges */
+.cluster-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.625rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
+}
+
+/* 18. Save-as-trip form */
+.cluster-card__save-form {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 19. Responsive – narrow viewports */
+@media (max-width: 640px) {
+  .search-form {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .form-row {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .form-actions {
+    width: 100%;
+  }
+
+  .form-actions .btn-primary {
+    width: 100%;
+  }
+
+  .cluster-card {
+    padding: 1rem 1.125rem;
+    border-radius: 8px;
+  }
+
+  .cluster-card__stadiums {
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+}

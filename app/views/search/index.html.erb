@@ -1,0 +1,56 @@
+<h1 class="page-heading">Find a Stadium Hopper Trip</h1>
+
+<% if flash.now[:alert] %>
+  <p class="flash-alert" role="alert"><%= flash.now[:alert] %></p>
+<% end %>
+
+<div data-controller="search-form">
+  <%= form_with url: search_path, method: :post, local: false,
+                class: "search-form",
+                data: { action: "submit->search-form#submitStart", turbo_frame: "cluster-results" } do |f| %>
+    <div class="form-row">
+      <label for="start_date">Start Date</label>
+      <%= date_field_tag :start_date, params[:start_date], id: "start_date", class: "form-control" %>
+    </div>
+
+    <div class="form-row">
+      <label for="end_date">End Date</label>
+      <%= date_field_tag :end_date, params[:end_date], id: "end_date", class: "form-control" %>
+    </div>
+
+    <div class="form-row">
+      <label for="max_trip_length">Max Trip Length</label>
+      <%= select_tag :max_trip_length,
+            options_for_select([3, 4, 5, 7, 10], (params[:max_trip_length]&.to_i || 7)),
+            id: "max_trip_length", class: "form-control" %>
+    </div>
+
+    <div class="form-row">
+      <label for="max_radius_miles">Max Radius (miles)</label>
+      <%= select_tag :max_radius_miles,
+            options_for_select([100, 250, 500, 750], (params[:max_radius_miles]&.to_i || 500)),
+            id: "max_radius_miles", class: "form-control" %>
+    </div>
+
+    <div class="form-row">
+      <label for="min_stadiums">Min Stadiums</label>
+      <%= select_tag :min_stadiums,
+            options_for_select([2, 3, 4], (params[:min_stadiums]&.to_i || 2)),
+            id: "min_stadiums", class: "form-control" %>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit "Find Trip Clusters",
+            class: "btn-primary",
+            data: { search_form_target: "button" } %>
+    </div>
+  <% end %>
+</div>
+
+<%= turbo_frame_tag "cluster-results" do %>
+  <% if request.get? %>
+    <p class="empty-state">Pick dates and search to see clusters.</p>
+  <% else %>
+    <%= render "results", clusters: @clusters %>
+  <% end %>
+<% end %>

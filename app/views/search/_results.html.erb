@@ -1,0 +1,9 @@
+<% clusters = local_assigns.fetch(:clusters, nil) %>
+
+<% if clusters.blank? %>
+  <p class="empty-state">No clusters found for those filters.</p>
+<% else %>
+  <section class="cluster-list">
+    <%= render partial: "cluster", collection: clusters, as: :cluster %>
+  </section>
+<% end %>

@@ -1,0 +1,47 @@
+<% venue_to_stadium = cluster.stadiums.index_by(&:mlb_venue_id) %>
+<% trip_name = "#{cluster.stadiums.first.city} → #{cluster.stadiums.last.city}" %>
+
+<article class="cluster-card">
+  <header class="cluster-card__header">
+    <ul class="cluster-card__stadiums">
+      <% cluster.stadiums.each do |stadium| %>
+        <li class="cluster-card__stadium">
+          <span class="stadium-team"><%= stadium.team_name %></span>
+          <span class="stadium-city"><%= stadium.city %></span>
+        </li>
+      <% end %>
+    </ul>
+  </header>
+
+  <div class="cluster-card__dates">
+    <%= format_cluster_date_range(cluster.start_date, cluster.end_date) %>
+  </div>
+
+  <div class="cluster-card__stats">
+    <span class="stat"><%= cluster.stadiums.count %> stadiums</span>
+    <span class="stat"><%= cluster.total_days %> days</span>
+    <span class="stat"><%= cluster.distance_miles.round %> mi max</span>
+  </div>
+
+  <%= form_with url: trips_path, method: :post, local: false, class: "cluster-card__save-form" do %>
+    <%= hidden_field_tag "trip[name]", trip_name %>
+    <%= hidden_field_tag "trip[start_date]", cluster.start_date %>
+    <%= hidden_field_tag "trip[end_date]", cluster.end_date %>
+
+    <% cluster.stadiums.each do |stadium| %>
+      <%= hidden_field_tag "trip[stadium_ids][]", stadium.id %>
+    <% end %>
+
+    <% cluster.games.each do |game| %>
+      <% game_stadium = venue_to_stadium[game[:venue_id]] %>
+      <%= hidden_field_tag "trip[games][][game_pk]", game[:game_pk] %>
+      <%= hidden_field_tag "trip[games][][game_date]", game[:game_date] %>
+      <%= hidden_field_tag "trip[games][][stadium_id]", game_stadium&.id %>
+      <%= hidden_field_tag "trip[games][][home_team_name]", game[:home_team_name] %>
+      <%= hidden_field_tag "trip[games][][away_team_name]", game[:away_team_name] %>
+      <%= hidden_field_tag "trip[games][][venue_name]", game[:venue_name] %>
+    <% end %>
+
+    <%= submit_tag "Save as Trip", class: "btn-primary" %>
+  <% end %>
+</article>
