@@ -20,41 +20,29 @@ RSpec.describe Stadium, type: :model do
     it { is_expected.to validate_uniqueness_of(:mlb_venue_id) }
   end
 
-  describe "nil field rejections" do
-    it "is invalid without a name" do
-      subject.name = nil
-      expect(subject).not_to be_valid
-      expect(subject.errors[:name]).to be_present
-    end
+  describe "associations" do
+    it { is_expected.to have_many(:trip_games).dependent(:restrict_with_error) }
+    it { is_expected.to have_many(:trips).through(:trip_games) }
+    it { is_expected.to have_one(:visited_stadium).dependent(:restrict_with_error) }
+  end
 
-    it "is invalid without a team_name" do
-      subject.team_name = nil
-      expect(subject).not_to be_valid
-      expect(subject.errors[:team_name]).to be_present
-    end
+  describe ".active" do
+    it "returns only stadiums where active is true" do
+      active_stadium = create(:stadium)
+      create(:stadium, active: false)
 
-    it "is invalid without a city" do
-      subject.city = nil
-      expect(subject).not_to be_valid
-      expect(subject.errors[:city]).to be_present
+      expect(Stadium.active).to contain_exactly(active_stadium)
     end
+  end
 
-    it "is invalid without a lat" do
-      subject.lat = nil
-      expect(subject).not_to be_valid
-      expect(subject.errors[:lat]).to be_present
-    end
+  describe "destruction restrictions" do
+    it "cannot be destroyed while trip_games exist" do
+      stadium = create(:stadium)
+      create(:trip_game, stadium: stadium)
 
-    it "is invalid without a lng" do
-      subject.lng = nil
-      expect(subject).not_to be_valid
-      expect(subject.errors[:lng]).to be_present
-    end
-
-    it "is invalid without an mlb_venue_id" do
-      subject.mlb_venue_id = nil
-      expect(subject).not_to be_valid
-      expect(subject.errors[:mlb_venue_id]).to be_present
+      expect(stadium.destroy).to be_falsey
+      expect(stadium.errors[:base]).to be_present
+      expect(Stadium.exists?(stadium.id)).to be true
     end
   end
 end

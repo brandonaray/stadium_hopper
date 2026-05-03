@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_03_003323) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_03_055752) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -29,4 +29,42 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_03_003323) do
     t.datetime "updated_at", null: false
     t.index ["mlb_venue_id"], name: "index_stadiums_on_mlb_venue_id", unique: true
   end
+
+  create_table "trip_games", force: :cascade do |t|
+    t.boolean "attended", default: false, null: false
+    t.string "away_team_name"
+    t.datetime "created_at", null: false
+    t.date "game_date", null: false
+    t.bigint "game_pk", null: false
+    t.string "home_team_name"
+    t.bigint "stadium_id", null: false
+    t.bigint "trip_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "venue_name"
+    t.index ["stadium_id"], name: "index_trip_games_on_stadium_id"
+    t.index ["trip_id", "game_pk"], name: "index_trip_games_on_trip_id_and_game_pk", unique: true
+  end
+
+  create_table "trips", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "end_date"
+    t.string "name", null: false
+    t.text "notes"
+    t.date "start_date"
+    t.datetime "updated_at", null: false
+    t.check_constraint "end_date IS NULL OR start_date IS NULL OR end_date >= start_date", name: "trips_end_date_after_start_date"
+  end
+
+  create_table "visited_stadiums", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "notes"
+    t.bigint "stadium_id", null: false
+    t.datetime "updated_at", null: false
+    t.date "visited_on"
+    t.index ["stadium_id"], name: "index_visited_stadiums_on_stadium_id", unique: true
+  end
+
+  add_foreign_key "trip_games", "stadiums"
+  add_foreign_key "trip_games", "trips"
+  add_foreign_key "visited_stadiums", "stadiums"
 end
