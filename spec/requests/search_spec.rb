@@ -28,19 +28,19 @@ RSpec.describe "Search", type: :request do
       let(:stadium)    { create(:stadium, team_name: "River City Rockets", city: "Springfield", mlb_venue_id: 3313) }
 
       let(:games) do
-        [{
+        [ {
           game_pk:        700_001,
           game_date:      start_date,
           venue_id:       stadium.mlb_venue_id,
           home_team_name: "River City Rockets",
           away_team_name: "Visiting Nine",
           venue_name:     stadium.name
-        }]
+        } ]
       end
 
       let(:cluster) do
         TripClusterFinder::Cluster.new(
-          stadiums:       [stadium],
+          stadiums:       [ stadium ],
           games:          games,
           start_date:     start_date,
           end_date:       end_date,
@@ -50,7 +50,7 @@ RSpec.describe "Search", type: :request do
         )
       end
 
-      let(:finder_double) { instance_double(TripClusterFinder, find_clusters: [cluster]) }
+      let(:finder_double) { instance_double(TripClusterFinder, find_clusters: [ cluster ]) }
 
       before do
         allow(TripClusterFinder).to receive(:new).and_return(finder_double)
