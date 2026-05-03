@@ -12,26 +12,40 @@ class TripClusterFinder
   def find_clusters
     games     = fetch_games
     venue_map = build_venue_map(games)
+    stadiums  = venue_map.values
 
-    raw = []
+    return [] if stadiums.size < @min_stadiums
+
+    proximity = build_proximity_graph(stadiums)
+    raw       = []
+
     (@start_date..@end_date).each do |window_start|
       window_end   = [ window_start + @max_trip_days - 1, @end_date ].min
       window_games = games_in_window(games, window_start, window_end)
       next if window_games.empty?
 
-      venue_ids = window_games.map { |g| g[:venue_id] }.uniq.compact
-      stadiums  = venue_ids.filter_map { |vid| venue_map[vid] }
-      next if stadiums.size < @min_stadiums
-      next unless all_within_radius?(stadiums)
+      games_by_venue  = window_games.group_by { |g| g[:venue_id] }
+      active_stadiums = games_by_venue.keys.filter_map { |vid| venue_map[vid] }
+      next if active_stadiums.size < @min_stadiums
 
-      raw << {
-        stadium_ids:    stadiums.map(&:id).sort,
-        stadiums:       stadiums,
-        games:          window_games,
-        start_date:     window_start,
-        end_date:       window_end,
-        distance_miles: max_pairwise_distance(stadiums)
-      }
+      proximity_cliques(active_stadiums, proximity).each do |subset|
+        dates_by_venue = subset.each_with_object({}) do |s, h|
+          h[s.mlb_venue_id] = games_by_venue[s.mlb_venue_id].map { |g| g[:game_date] }.uniq
+        end
+        next unless attendable_on_different_days?(dates_by_venue)
+
+        subset_venue_ids = subset.map(&:mlb_venue_id).to_set
+        subset_games     = window_games.select { |g| subset_venue_ids.include?(g[:venue_id]) }
+
+        raw << {
+          stadium_ids:    subset.map(&:id).sort,
+          stadiums:       subset,
+          games:          subset_games,
+          start_date:     window_start,
+          end_date:       window_end,
+          distance_miles: max_pairwise_distance(subset)
+        }
+      end
     end
 
     deduplicate(raw).map { |c| build_cluster(c) }.sort_by { |c| -c.score }
@@ -52,9 +66,31 @@ class TripClusterFinder
     games.select { |g| g[:game_date] >= window_start && g[:game_date] <= window_end }
   end
 
-  def all_within_radius?(stadiums)
-    stadiums.combination(2).all? do |a, b|
-      StadiumDistanceCalculator.distance_between(a, b) <= @max_radius_miles
+  def build_proximity_graph(stadiums)
+    stadiums.each_with_object({}) do |a, graph|
+      graph[a.id] = stadiums.filter_map do |b|
+        b.id if a.id != b.id && StadiumDistanceCalculator.distance_between(a, b) <= @max_radius_miles
+      end
+    end
+  end
+
+  def proximity_cliques(stadiums, proximity)
+    (@min_stadiums..stadiums.size).flat_map do |size|
+      stadiums.combination(size).select do |subset|
+        subset.combination(2).all? { |a, b| proximity[a.id]&.include?(b.id) }
+      end
+    end
+  end
+
+  # Returns true if we can assign each stadium a game on a unique day.
+  # Sorts by fewest options first to fail fast on tightly constrained stadiums.
+  def attendable_on_different_days?(dates_by_venue)
+    used = []
+    dates_by_venue.sort_by { |_, dates| dates.size }.all? do |_, dates|
+      pick = (dates - used).first
+      return false unless pick
+      used << pick
+      true
     end
   end
 
