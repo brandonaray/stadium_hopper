@@ -63,8 +63,10 @@ gem "faraday", "~> 2.14"
 gem "faraday-retry", "~> 2.4"
 gem "redis", "~> 5.4"
 
-gem "rspec-rails", "~> 8.0", groups: [:development, :test]
-gem "factory_bot_rails", "~> 6.5", groups: [:development, :test]
-gem "shoulda-matchers", "~> 7.0", groups: [:development, :test]
+gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]
+gem "factory_bot_rails", "~> 6.5", groups: [ :development, :test ]
+gem "shoulda-matchers", "~> 7.0", groups: [ :development, :test ]
 
-gem "dotenv-rails", "~> 3.2", groups: [:development, :test]
+gem "dotenv-rails", "~> 3.2", groups: [ :development, :test ]
+
+gem "webmock", "~> 3.26", groups: [ :development, :test ]
